@@ -1,12 +1,28 @@
 export const config = { api: { bodyParser: { sizeLimit: '1mb' } } };
 
-const CATEGORY_ICONS = [
-  { bg: '#fff8e6', emoji: '🏠' },
-  { bg: '#e8f4ff', emoji: '💳' },
-  { bg: '#f0eeff', emoji: '🍺' },
-];
-
 const LATEST_MATERIALS_URL = 'https://drive.google.com/drive/folders/1P_kNgpn_8kHRBx3HjjfHmLCB4uVhyw5g';
+
+// 업종명 키워드 → 아이콘 매핑
+function getIcon(name) {
+  const n = name.toLowerCase();
+  if (/뷰티|화장품|코스메틱|스킨케어|미용/.test(n)) return { emoji: '💄', bg: '#fdf0f5' };
+  if (/여행|숙박|호텔|항공|투어/.test(n)) return { emoji: '✈️', bg: '#e8f4ff' };
+  if (/커머스|쇼핑|이커머스|플랫폼|리테일/.test(n)) return { emoji: '🛒', bg: '#fff0e8' };
+  if (/금융|은행|보험|증권|카드|핀테크/.test(n)) return { emoji: '💳', bg: '#e8f4ff' };
+  if (/패션|의류|의상|패션/.test(n)) return { emoji: '👗', bg: '#f5e8ff' };
+  if (/식품|F&B|외식|프랜차이즈|음식|레스토랑|카페/.test(n)) return { emoji: '🍽️', bg: '#fff8e6' };
+  if (/주류|술|맥주|와인|위스키/.test(n)) return { emoji: '🍺', bg: '#f0eeff' };
+  if (/자동차|모빌리티|차량|EV|전기차/.test(n)) return { emoji: '🚗', bg: '#e8fff0' };
+  if (/게임|엔터테인먼트|콘텐츠|OTT|미디어/.test(n)) return { emoji: '🎮', bg: '#eef0ff' };
+  if (/헬스|건강|의료|제약|바이오|피트니스/.test(n)) return { emoji: '💊', bg: '#e8fff5' };
+  if (/교육|에듀테크|학습|학원/.test(n)) return { emoji: '📚', bg: '#fff8e6' };
+  if (/리빙|가구|인테리어|홈/.test(n)) return { emoji: '🏠', bg: '#fff8e6' };
+  if (/가전|전자|IT|테크/.test(n)) return { emoji: '📱', bg: '#e8f4ff' };
+  if (/키즈|아동|유아|육아/.test(n)) return { emoji: '🧸', bg: '#fff0e8' };
+  if (/펫|반려동물|동물병원/.test(n)) return { emoji: '🐾', bg: '#f0fdf4' };
+  if (/시즈널|계절|이슈/.test(n)) return { emoji: '📅', bg: '#f3f0e9' };
+  return { emoji: '📌', bg: '#f3f0e9' };
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,14 +31,16 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { volNumber, volDate, intro, pptAllLink, pdfAllLink, categories } = req.body;
+  const { volNumber, volDate, intro, subText, pptAllLink, pdfAllLink, categories } = req.body;
 
   if (!categories || categories.length !== 3) {
     return res.status(400).json({ error: '업종 3개가 필요합니다.' });
   }
 
+  const defaultSubText = '달라지는 소비 흐름과 공간 미디어 인사이트를<br>이번 슾가락에서 확인해보세요.';
+
   const categoryHTML = categories.map((cat, i) => {
-    const icon = CATEGORY_ICONS[i] || { bg: '#f3f0e9', emoji: '📌' };
+    const icon = getIcon(cat.name);
     const num = String(i + 1).padStart(2, '0');
     return `
         <!-- CAT ${num} ${cat.name} -->
@@ -93,7 +111,7 @@ export default async function handler(req, res) {
           </tr>
         </table>
         <p style="margin:20px 0 8px;font-size:24px;font-weight:700;color:#ffffff;line-height:1.4;">${intro || '이달의 소비 트렌드,<br>지금 확인해보세요'}</p>
-        <p style="margin:0 0 22px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.75;">달라지는 소비 흐름과 공간 미디어 인사이트를<br>이번 슾가락에서 확인해보세요.</p>
+        <p style="margin:0 0 22px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.75;">${subText || defaultSubText}</p>
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td width="49%" style="padding-right:6px;">
@@ -116,13 +134,18 @@ ${categoryHTML}
 
     <!-- FOOTER -->
     <tr>
-      <td style="background-color:#ffffff;padding:20px 36px 24px;border-top:1px solid #e8e5de;text-align:center;">
-        <p style="margin:0 0 6px;font-size:11px;color:#bbbbbb;line-height:1.8;">${volNumber ? volNumber + '번째 ' : ''}슾가락, 어떠셨나요? &#128522;<br>문의: <a href="mailto:sac@spaceadd.com" style="color:#999999;text-decoration:none;">sac@spaceadd.com</a> 또는 담당자에게 편하게 연락 주세요.</p>
-        <p style="margin:0;font-size:11px;color:#bbbbbb;">
-          <a href="${LATEST_MATERIALS_URL}" style="color:#999999;text-decoration:none;">최신 자료 모아보기</a>
-          &nbsp;&middot;&nbsp;
-          <a href="$%unsubscribe%$" style="color:#999999;text-decoration:none;">수신거부</a>
-        </p>
+      <td style="background-color:#ffffff;padding:28px 36px 32px;border-top:1px solid #e8e5de;text-align:center;">
+        <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#333333;">이번 슾가락, 어떠셨나요? 😊</p>
+        <p style="margin:0 0 14px;font-size:12px;color:#888888;line-height:1.9;">궁금하신 점이나 필요하신 내용은 언제든지 편하게 연락 주세요.<br><a href="mailto:sac@spaceadd.com" style="color:#555555;font-weight:700;text-decoration:none;">sac@spaceadd.com</a> 또는 담당 매니저에게 직접 연락 주셔도 됩니다.</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #f0ede6;padding-top:14px;margin-top:4px;">
+          <tr>
+            <td align="center" style="padding-top:14px;">
+              <a href="${LATEST_MATERIALS_URL}" style="color:#777777;font-size:12px;text-decoration:none;">최신 자료 모아보기</a>
+              <span style="color:#cccccc;font-size:12px;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+              <a href="$%unsubscribe%$" style="color:#777777;font-size:12px;text-decoration:none;">수신거부</a>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
 
