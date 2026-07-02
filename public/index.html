@@ -25,10 +25,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
 .field label{display:block;font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.05em}
 .field input,.field textarea{width:100%;padding:10px 12px;border:.5px solid #d8d4cb;border-radius:8px;font-size:13px;color:#111;background:#faf9f6;font-family:inherit;outline:none;transition:border-color .15s}
 .field input:focus,.field textarea:focus{border-color:#0f1117}
-.field textarea{resize:vertical;min-height:60px;line-height:1.6}
+.field textarea{resize:vertical;line-height:1.6}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-.cat-block{border:.5px solid #e8e5de;border-radius:10px;padding:18px 20px;margin-bottom:12px;background:#faf9f6;position:relative}
+.cat-block{border:.5px solid #e8e5de;border-radius:10px;padding:18px 20px;margin-bottom:12px;background:#faf9f6}
 .cat-block:last-child{margin-bottom:0}
 .cat-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:#bbb;text-transform:uppercase;margin-bottom:12px}
 
@@ -36,9 +36,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
 .upload-area:hover{border-color:#0f1117;background:#faf9f6}
 .upload-area.has-file{border-color:#1a8c4e;background:#f0faf4;border-style:solid}
 .upload-area input[type=file]{display:none}
+.upload-icon{font-size:20px;margin-bottom:6px}
 .upload-label{font-size:12px;color:#aaa;cursor:pointer}
 .upload-label.has-file{color:#1a8c4e;font-weight:700}
-.upload-icon{font-size:20px;margin-bottom:6px}
 
 .status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:10px}
 .status-badge.waiting{background:#f3f0e9;color:#999}
@@ -46,10 +46,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
 .status-badge.done{background:#e8f9ef;color:#1a8c4e}
 .status-badge.error{background:#fff0f0;color:#c0392b}
 
-.insight-preview{font-size:12px;color:#444;line-height:1.7;background:#fff;border:.5px solid #e8e5de;border-radius:8px;padding:10px 12px;margin-top:8px;display:none}
-.callout-preview{font-size:11px;color:#7a5500;background:#fffbf0;border-left:2px solid #f5a623;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;display:none}
+/* 분석 결과 편집 영역 */
+.result-edit-area{display:none;margin-top:10px;border:.5px solid #d8d4cb;border-radius:8px;overflow:hidden;background:#fff}
+.result-edit-area.visible{display:block}
+.result-edit-header{background:#f3f0e9;padding:8px 12px;font-size:10px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.result-edit-header span{color:#1a8c4e}
+.edit-field{padding:10px 12px;border-bottom:.5px solid #f0ede6}
+.edit-field:last-child{border-bottom:none}
+.edit-field label{display:block;font-size:10px;font-weight:700;color:#aaa;margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em}
+.edit-field textarea{width:100%;border:none;background:transparent;font-size:12px;color:#333;font-family:inherit;resize:vertical;outline:none;line-height:1.7;min-height:60px}
 
-.analyze-btn{width:100%;padding:9px 0;background:#0f1117;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;transition:opacity .2s}
+.analyze-btn{width:100%;padding:9px 0;background:#0f1117;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
 .analyze-btn:disabled{opacity:.4;cursor:not-allowed}
 
 .gen-btn{width:100%;padding:14px 0;background:#0f1117;color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
@@ -87,7 +94,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
   <div class="row2">
     <div class="field">
       <label>호수 (숫자만)</label>
-      <input type="text" id="volNumber" placeholder="예: 28">
+      <input type="text" id="volNumber" placeholder="예: 29">
     </div>
     <div class="field">
       <label>발행 월 (영문)</label>
@@ -97,6 +104,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
   <div class="field">
     <label>헤더 제목 (줄바꿈은 &lt;br&gt; 사용)</label>
     <input type="text" id="intro" placeholder="예: 여름 소비가 활발해지는 7월,&lt;br&gt;주목할 트렌드">
+  </div>
+  <div class="field">
+    <label>헤더 부제 (제목 아래 회색 설명 텍스트 · 줄바꿈은 &lt;br&gt; 사용)</label>
+    <input type="text" id="subText" placeholder="예: 달라지는 소비 흐름과 공간 미디어 인사이트를&lt;br&gt;이번 슾가락에서 확인해보세요.">
   </div>
   <div class="row2">
     <div class="field">
@@ -127,10 +138,19 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
       <div class="upload-label" id="uploadLabel0">PDF 파일을 클릭해서 선택하세요</div>
     </div>
     <div class="status-badge waiting" id="statusBadge0">대기 중</div>
-    <div class="insight-preview" id="insightPreview0"></div>
-    <div class="callout-preview" id="calloutPreview0"></div>
     <button class="analyze-btn" id="analyzeBtn0" onclick="analyzePDF(0)" disabled>AI 인사이트 분석</button>
     <div class="error-msg" id="errorMsg0"></div>
+    <div class="result-edit-area" id="resultEdit0">
+      <div class="result-edit-header">AI 분석 결과 <span>✓ 직접 수정 가능</span></div>
+      <div class="edit-field">
+        <label>인사이트 (HTML 태그 사용 가능 · &lt;strong&gt;으로 강조)</label>
+        <textarea id="insightEdit0" oninput="syncInsight(0)"></textarea>
+      </div>
+      <div class="edit-field">
+        <label>공간미디어 연결 포인트 (Callout)</label>
+        <textarea id="calloutEdit0" rows="2" oninput="syncCallout(0)"></textarea>
+      </div>
+    </div>
     <div class="field" style="margin-top:12px">
       <label>레퍼런스 이미지 URL (스티비 CDN)</label>
       <input type="url" id="imageUrl0" placeholder="https://img2.stibee.com/...">
@@ -160,10 +180,19 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
       <div class="upload-label" id="uploadLabel1">PDF 파일을 클릭해서 선택하세요</div>
     </div>
     <div class="status-badge waiting" id="statusBadge1">대기 중</div>
-    <div class="insight-preview" id="insightPreview1"></div>
-    <div class="callout-preview" id="calloutPreview1"></div>
     <button class="analyze-btn" id="analyzeBtn1" onclick="analyzePDF(1)" disabled>AI 인사이트 분석</button>
     <div class="error-msg" id="errorMsg1"></div>
+    <div class="result-edit-area" id="resultEdit1">
+      <div class="result-edit-header">AI 분석 결과 <span>✓ 직접 수정 가능</span></div>
+      <div class="edit-field">
+        <label>인사이트 (HTML 태그 사용 가능 · &lt;strong&gt;으로 강조)</label>
+        <textarea id="insightEdit1" oninput="syncInsight(1)"></textarea>
+      </div>
+      <div class="edit-field">
+        <label>공간미디어 연결 포인트 (Callout)</label>
+        <textarea id="calloutEdit1" rows="2" oninput="syncCallout(1)"></textarea>
+      </div>
+    </div>
     <div class="field" style="margin-top:12px">
       <label>레퍼런스 이미지 URL (스티비 CDN)</label>
       <input type="url" id="imageUrl1" placeholder="https://img2.stibee.com/...">
@@ -193,10 +222,19 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;p
       <div class="upload-label" id="uploadLabel2">PDF 파일을 클릭해서 선택하세요</div>
     </div>
     <div class="status-badge waiting" id="statusBadge2">대기 중</div>
-    <div class="insight-preview" id="insightPreview2"></div>
-    <div class="callout-preview" id="calloutPreview2"></div>
     <button class="analyze-btn" id="analyzeBtn2" onclick="analyzePDF(2)" disabled>AI 인사이트 분석</button>
     <div class="error-msg" id="errorMsg2"></div>
+    <div class="result-edit-area" id="resultEdit2">
+      <div class="result-edit-header">AI 분석 결과 <span>✓ 직접 수정 가능</span></div>
+      <div class="edit-field">
+        <label>인사이트 (HTML 태그 사용 가능 · &lt;strong&gt;으로 강조)</label>
+        <textarea id="insightEdit2" oninput="syncInsight(2)"></textarea>
+      </div>
+      <div class="edit-field">
+        <label>공간미디어 연결 포인트 (Callout)</label>
+        <textarea id="calloutEdit2" rows="2" oninput="syncCallout(2)"></textarea>
+      </div>
+    </div>
     <div class="field" style="margin-top:12px">
       <label>레퍼런스 이미지 URL (스티비 CDN)</label>
       <input type="url" id="imageUrl2" placeholder="https://img2.stibee.com/...">
@@ -238,15 +276,12 @@ function onFileSelected(idx, input) {
   const file = input.files[0];
   if (!file) return;
   pdfFiles[idx] = file;
-
   document.getElementById('uploadArea' + idx).classList.add('has-file');
   document.getElementById('uploadLabel' + idx).textContent = file.name;
   document.getElementById('uploadLabel' + idx).classList.add('has-file');
   document.getElementById('analyzeBtn' + idx).disabled = false;
-
   setStatus(idx, 'waiting', '파일 선택됨 — 분석 버튼을 누르세요');
-  document.getElementById('insightPreview' + idx).style.display = 'none';
-  document.getElementById('calloutPreview' + idx).style.display = 'none';
+  document.getElementById('resultEdit' + idx).classList.remove('visible');
   insights[idx] = null;
   callouts[idx] = null;
 }
@@ -257,6 +292,14 @@ function setStatus(idx, type, text) {
   badge.innerHTML = type === 'loading'
     ? '<span class="spinner"></span> ' + text
     : text;
+}
+
+function syncInsight(idx) {
+  insights[idx] = document.getElementById('insightEdit' + idx).value;
+}
+
+function syncCallout(idx) {
+  callouts[idx] = document.getElementById('calloutEdit' + idx).value;
 }
 
 async function analyzePDF(idx) {
@@ -284,14 +327,12 @@ async function analyzePDF(idx) {
     insights[idx] = data.insight;
     callouts[idx] = data.callout;
 
-    const insightEl = document.getElementById('insightPreview' + idx);
-    const calloutEl = document.getElementById('calloutPreview' + idx);
-    insightEl.innerHTML = data.insight;
-    insightEl.style.display = 'block';
-    calloutEl.textContent = '💡 ' + data.callout;
-    calloutEl.style.display = 'block';
+    // 편집 가능한 textarea에 결과 채우기
+    document.getElementById('insightEdit' + idx).value = data.insight;
+    document.getElementById('calloutEdit' + idx).value = data.callout;
+    document.getElementById('resultEdit' + idx).classList.add('visible');
 
-    setStatus(idx, 'done', '✓ 분석 완료');
+    setStatus(idx, 'done', '✓ 분석 완료 — 아래에서 내용 수정 가능');
     btn.textContent = '다시 분석';
     btn.disabled = false;
   } catch (e) {
@@ -304,7 +345,6 @@ async function analyzePDF(idx) {
 }
 
 async function generateHTML() {
-  // 분석 완료 확인
   const missing = [0,1,2].filter(i => !insights[i]);
   if (missing.length > 0) {
     alert('업종 ' + missing.map(i => i+1).join(', ') + '의 AI 분석을 먼저 완료해주세요.');
@@ -332,6 +372,7 @@ async function generateHTML() {
         volNumber: document.getElementById('volNumber').value.trim(),
         volDate: document.getElementById('volDate').value.trim(),
         intro: document.getElementById('intro').value.trim(),
+        subText: document.getElementById('subText').value.trim(),
         pptAllLink: document.getElementById('pptAllLink').value.trim(),
         pdfAllLink: document.getElementById('pdfAllLink').value.trim(),
         categories
