@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>슾가락 뉴스레터 생성기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f2f1ed;min-height:100vh;padding:32px 16px 80px;color:#111}
+.container{max-width:760px;margin:0 auto}
+
+.header{background:#0f1117;border-radius:14px;padding:26px 30px 22px;margin-bottom:20px}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.logo{font-size:20px;font-weight:700;color:#fff;font-family:Georgia,serif}
+.logo-sub{font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.35);text-transform:uppercase}
+.header-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7}
+
+.section{background:#fff;border:.5px solid #e8e5de;border-radius:12px;padding:22px 24px;margin-bottom:14px}
+.section-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:#bbb;text-transform:uppercase;margin-bottom:16px}
+
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:11px;font-weight:700;color:#888;margin-bottom:6px;letter-spacing:.05em}
+.field input,.field textarea{width:100%;padding:10px 12px;border:.5px solid #d8d4cb;border-radius:8px;font-size:13px;color:#111;background:#faf9f6;font-family:inherit;outline:none;transition:border-color .15s}
+.field input:focus,.field textarea:focus{border-color:#0f1117}
+.field textarea{resize:vertical;min-height:60px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.cat-block{border:.5px solid #e8e5de;border-radius:10px;padding:18px 20px;margin-bottom:12px;background:#faf9f6;position:relative}
+.cat-block:last-child{margin-bottom:0}
+.cat-num{font-size:10px;font-weight:700;letter-spacing:.1em;color:#bbb;text-transform:uppercase;margin-bottom:12px}
+
+.upload-area{border:1.5px dashed #d8d4cb;border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;margin-bottom:10px}
+.upload-area:hover{border-color:#0f1117;background:#faf9f6}
+.upload-area.has-file{border-color:#1a8c4e;background:#f0faf4;border-style:solid}
+.upload-area input[type=file]{display:none}
+.upload-label{font-size:12px;color:#aaa;cursor:pointer}
+.upload-label.has-file{color:#1a8c4e;font-weight:700}
+.upload-icon{font-size:20px;margin-bottom:6px}
+
+.status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:10px}
+.status-badge.waiting{background:#f3f0e9;color:#999}
+.status-badge.loading{background:#fff8e6;color:#b07800}
+.status-badge.done{background:#e8f9ef;color:#1a8c4e}
+.status-badge.error{background:#fff0f0;color:#c0392b}
+
+.insight-preview{font-size:12px;color:#444;line-height:1.7;background:#fff;border:.5px solid #e8e5de;border-radius:8px;padding:10px 12px;margin-top:8px;display:none}
+.callout-preview{font-size:11px;color:#7a5500;background:#fffbf0;border-left:2px solid #f5a623;border-radius:0 6px 6px 0;padding:6px 10px;margin-top:6px;display:none}
+
+.analyze-btn{width:100%;padding:9px 0;background:#0f1117;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;transition:opacity .2s}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.gen-btn{width:100%;padding:14px 0;background:#0f1117;color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:opacity .2s}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.output-section{display:none}
+.output-section.visible{display:block}
+.output-box{background:#fff;border:.5px solid #e8e5de;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.output-header{background:#0f1117;padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.output-title{font-size:12px;font-weight:700;color:#fff;letter-spacing:.08em}
+.copy-btn{padding:7px 16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.copy-btn:hover{background:rgba(255,255,255,.25)}
+.copy-btn.done{background:#1a8c4e}
+.output-code{padding:16px 18px;font-family:monospace;font-size:11px;color:#444;line-height:1.6;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+
+.error-msg{color:#c0392b;font-size:12px;margin-top:8px;display:none}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(0,0,0,.1);border-top-color:#b07800;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="header-top">
+    <span class="logo">슾가락</span>
+    <span class="logo-sub">Newsletter HTML Generator</span>
+  </div>
+  <p class="header-desc">업종별 PDF를 올리면 AI가 인사이트를 분석하고 스티비용 HTML을 자동 생성합니다.</p>
+</div>
+
+<!-- 기본 정보 -->
+<div class="section">
+  <div class="section-title">기본 정보</div>
+  <div class="row2">
+    <div class="field">
+      <label>호수 (숫자만)</label>
+      <input type="text" id="volNumber" placeholder="예: 28">
+    </div>
+    <div class="field">
+      <label>발행 월 (영문)</label>
+      <input type="text" id="volDate" placeholder="예: July 2026">
+    </div>
+  </div>
+  <div class="field">
+    <label>헤더 제목 (줄바꿈은 &lt;br&gt; 사용)</label>
+    <input type="text" id="intro" placeholder="예: 여름 소비가 활발해지는 7월,&lt;br&gt;주목할 트렌드">
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>전체 자료 PPT 링크</label>
+      <input type="url" id="pptAllLink" placeholder="구글 드라이브 링크">
+    </div>
+    <div class="field">
+      <label>전체 자료 PDF 링크</label>
+      <input type="url" id="pdfAllLink" placeholder="구글 드라이브 링크">
+    </div>
+  </div>
+</div>
+
+<!-- 업종 3개 -->
+<div class="section">
+  <div class="section-title">업종별 정보</div>
+
+  <!-- CAT 01 -->
+  <div class="cat-block">
+    <div class="cat-num">Category 01</div>
+    <div class="field">
+      <label>업종명</label>
+      <input type="text" id="name0" placeholder="예: 뷰티">
+    </div>
+    <div class="upload-area" id="uploadArea0" onclick="document.getElementById('pdfFile0').click()">
+      <div class="upload-icon">📄</div>
+      <input type="file" id="pdfFile0" accept=".pdf" onchange="onFileSelected(0, this)">
+      <div class="upload-label" id="uploadLabel0">PDF 파일을 클릭해서 선택하세요</div>
+    </div>
+    <div class="status-badge waiting" id="statusBadge0">대기 중</div>
+    <div class="insight-preview" id="insightPreview0"></div>
+    <div class="callout-preview" id="calloutPreview0"></div>
+    <button class="analyze-btn" id="analyzeBtn0" onclick="analyzePDF(0)" disabled>AI 인사이트 분석</button>
+    <div class="error-msg" id="errorMsg0"></div>
+    <div class="field" style="margin-top:12px">
+      <label>레퍼런스 이미지 URL (스티비 CDN)</label>
+      <input type="url" id="imageUrl0" placeholder="https://img2.stibee.com/...">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>PPT 링크</label>
+        <input type="url" id="pptLink0" placeholder="구글 드라이브 링크">
+      </div>
+      <div class="field">
+        <label>PDF 링크</label>
+        <input type="url" id="pdfLink0" placeholder="구글 드라이브 링크">
+      </div>
+    </div>
+  </div>
+
+  <!-- CAT 02 -->
+  <div class="cat-block">
+    <div class="cat-num">Category 02</div>
+    <div class="field">
+      <label>업종명</label>
+      <input type="text" id="name1" placeholder="예: 여행 & 숙박">
+    </div>
+    <div class="upload-area" id="uploadArea1" onclick="document.getElementById('pdfFile1').click()">
+      <div class="upload-icon">📄</div>
+      <input type="file" id="pdfFile1" accept=".pdf" onchange="onFileSelected(1, this)">
+      <div class="upload-label" id="uploadLabel1">PDF 파일을 클릭해서 선택하세요</div>
+    </div>
+    <div class="status-badge waiting" id="statusBadge1">대기 중</div>
+    <div class="insight-preview" id="insightPreview1"></div>
+    <div class="callout-preview" id="calloutPreview1"></div>
+    <button class="analyze-btn" id="analyzeBtn1" onclick="analyzePDF(1)" disabled>AI 인사이트 분석</button>
+    <div class="error-msg" id="errorMsg1"></div>
+    <div class="field" style="margin-top:12px">
+      <label>레퍼런스 이미지 URL (스티비 CDN)</label>
+      <input type="url" id="imageUrl1" placeholder="https://img2.stibee.com/...">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>PPT 링크</label>
+        <input type="url" id="pptLink1" placeholder="구글 드라이브 링크">
+      </div>
+      <div class="field">
+        <label>PDF 링크</label>
+        <input type="url" id="pdfLink1" placeholder="구글 드라이브 링크">
+      </div>
+    </div>
+  </div>
+
+  <!-- CAT 03 -->
+  <div class="cat-block">
+    <div class="cat-num">Category 03</div>
+    <div class="field">
+      <label>업종명</label>
+      <input type="text" id="name2" placeholder="예: 커머스">
+    </div>
+    <div class="upload-area" id="uploadArea2" onclick="document.getElementById('pdfFile2').click()">
+      <div class="upload-icon">📄</div>
+      <input type="file" id="pdfFile2" accept=".pdf" onchange="onFileSelected(2, this)">
+      <div class="upload-label" id="uploadLabel2">PDF 파일을 클릭해서 선택하세요</div>
+    </div>
+    <div class="status-badge waiting" id="statusBadge2">대기 중</div>
+    <div class="insight-preview" id="insightPreview2"></div>
+    <div class="callout-preview" id="calloutPreview2"></div>
+    <button class="analyze-btn" id="analyzeBtn2" onclick="analyzePDF(2)" disabled>AI 인사이트 분석</button>
+    <div class="error-msg" id="errorMsg2"></div>
+    <div class="field" style="margin-top:12px">
+      <label>레퍼런스 이미지 URL (스티비 CDN)</label>
+      <input type="url" id="imageUrl2" placeholder="https://img2.stibee.com/...">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>PPT 링크</label>
+        <input type="url" id="pptLink2" placeholder="구글 드라이브 링크">
+      </div>
+      <div class="field">
+        <label>PDF 링크</label>
+        <input type="url" id="pdfLink2" placeholder="구글 드라이브 링크">
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="gen-btn" id="genBtn" onclick="generateHTML()">✦ 뉴스레터 HTML 생성</button>
+
+<!-- 결과 -->
+<div class="output-section" id="outputSection">
+  <div class="output-box">
+    <div class="output-header">
+      <span class="output-title">생성된 HTML — 스티비에 붙여넣으세요</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyHTML()">복사</button>
+    </div>
+    <div class="output-code" id="outputCode"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const pdfFiles = [null, null, null];
+const insights = [null, null, null];
+const callouts = [null, null, null];
+
+function onFileSelected(idx, input) {
+  const file = input.files[0];
+  if (!file) return;
+  pdfFiles[idx] = file;
+
+  document.getElementById('uploadArea' + idx).classList.add('has-file');
+  document.getElementById('uploadLabel' + idx).textContent = file.name;
+  document.getElementById('uploadLabel' + idx).classList.add('has-file');
+  document.getElementById('analyzeBtn' + idx).disabled = false;
+
+  setStatus(idx, 'waiting', '파일 선택됨 — 분석 버튼을 누르세요');
+  document.getElementById('insightPreview' + idx).style.display = 'none';
+  document.getElementById('calloutPreview' + idx).style.display = 'none';
+  insights[idx] = null;
+  callouts[idx] = null;
+}
+
+function setStatus(idx, type, text) {
+  const badge = document.getElementById('statusBadge' + idx);
+  badge.className = 'status-badge ' + type;
+  badge.innerHTML = type === 'loading'
+    ? '<span class="spinner"></span> ' + text
+    : text;
+}
+
+async function analyzePDF(idx) {
+  const file = pdfFiles[idx];
+  const name = document.getElementById('name' + idx).value.trim();
+  if (!file) { alert('PDF 파일을 먼저 선택하세요.'); return; }
+  if (!name) { alert('업종명을 먼저 입력하세요.'); return; }
+
+  const btn = document.getElementById('analyzeBtn' + idx);
+  btn.disabled = true;
+  setStatus(idx, 'loading', 'AI 분석 중...');
+  document.getElementById('errorMsg' + idx).style.display = 'none';
+
+  try {
+    const base64 = await fileToBase64(file);
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pdfBase64: base64, industryName: name })
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '알 수 없는 오류');
+
+    insights[idx] = data.insight;
+    callouts[idx] = data.callout;
+
+    const insightEl = document.getElementById('insightPreview' + idx);
+    const calloutEl = document.getElementById('calloutPreview' + idx);
+    insightEl.innerHTML = data.insight;
+    insightEl.style.display = 'block';
+    calloutEl.textContent = '💡 ' + data.callout;
+    calloutEl.style.display = 'block';
+
+    setStatus(idx, 'done', '✓ 분석 완료');
+    btn.textContent = '다시 분석';
+    btn.disabled = false;
+  } catch (e) {
+    setStatus(idx, 'error', '분석 실패');
+    const errEl = document.getElementById('errorMsg' + idx);
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+  }
+}
+
+async function generateHTML() {
+  // 분석 완료 확인
+  const missing = [0,1,2].filter(i => !insights[i]);
+  if (missing.length > 0) {
+    alert('업종 ' + missing.map(i => i+1).join(', ') + '의 AI 분석을 먼저 완료해주세요.');
+    return;
+  }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = 'HTML 생성 중...';
+
+  try {
+    const categories = [0,1,2].map(i => ({
+      name: document.getElementById('name' + i).value.trim(),
+      insight: insights[i],
+      callout: callouts[i],
+      imageUrl: document.getElementById('imageUrl' + i).value.trim(),
+      pptLink: document.getElementById('pptLink' + i).value.trim(),
+      pdfLink: document.getElementById('pdfLink' + i).value.trim(),
+    }));
+
+    const res = await fetch('/api/generate-html', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        volNumber: document.getElementById('volNumber').value.trim(),
+        volDate: document.getElementById('volDate').value.trim(),
+        intro: document.getElementById('intro').value.trim(),
+        pptAllLink: document.getElementById('pptAllLink').value.trim(),
+        pdfAllLink: document.getElementById('pdfAllLink').value.trim(),
+        categories
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || '생성 실패');
+
+    document.getElementById('outputCode').textContent = data.html;
+    document.getElementById('outputSection').classList.add('visible');
+    document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    btn.textContent = '✦ HTML 재생성';
+    btn.disabled = false;
+  } catch (e) {
+    alert('오류: ' + e.message);
+    btn.textContent = '✦ 뉴스레터 HTML 생성';
+    btn.disabled = false;
+  }
+}
+
+function copyHTML() {
+  const code = document.getElementById('outputCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ 복사됨';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('done'); }, 2000);
+  });
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
