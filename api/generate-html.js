@@ -134,15 +134,15 @@ ${categoryHTML}
 
     <!-- FOOTER -->
     <tr>
-      <td style="background-color:#ffffff;padding:28px 36px 32px;border-top:1px solid #e8e5de;text-align:center;">
-        <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#333333;">이번 슾가락, 어떠셨나요? 😊</p>
-        <p style="margin:0 0 14px;font-size:12px;color:#888888;line-height:1.9;">궁금하신 점이나 필요하신 내용은 언제든지 편하게 연락 주세요.<br><a href="mailto:sac@spaceadd.com" style="color:#555555;font-weight:700;text-decoration:none;">sac@spaceadd.com</a> 또는 담당 매니저에게 직접 연락 주셔도 됩니다.</p>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #f0ede6;padding-top:14px;margin-top:4px;">
+      <td style="background-color:#0f1117;padding:28px 36px 32px;text-align:center;">
+        <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#ffffff;">이번 슾가락, 어떠셨나요? 😊</p>
+        <p style="margin:0 0 16px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.9;">궁금하신 점이나 필요하신 내용은 언제든지 편하게 연락 주세요.<br><a href="mailto:sac@spaceadd.com" style="color:rgba(255,255,255,0.8);font-weight:700;text-decoration:none;">sac@spaceadd.com</a> 또는 담당 매니저에게 직접 연락 주셔도 됩니다.</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            <td align="center" style="padding-top:14px;">
-              <a href="${LATEST_MATERIALS_URL}" style="color:#777777;font-size:12px;text-decoration:none;">최신 자료 모아보기</a>
-              <span style="color:#cccccc;font-size:12px;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
-              <a href="$%unsubscribe%$" style="color:#777777;font-size:12px;text-decoration:none;">수신거부</a>
+            <td align="center" style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;">
+              <a href="${LATEST_MATERIALS_URL}" style="color:rgba(255,255,255,0.45);font-size:11px;text-decoration:none;">최신 자료 모아보기</a>
+              <span style="color:rgba(255,255,255,0.2);font-size:11px;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+              <a href="$%unsubscribe%$" style="color:rgba(255,255,255,0.45);font-size:11px;text-decoration:none;">수신거부</a>
             </td>
           </tr>
         </table>
